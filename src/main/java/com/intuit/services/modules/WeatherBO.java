@@ -27,6 +27,7 @@ public class WeatherBO {
     GsonBuilder gsonBuilder = new GsonBuilder();
     Gson gson = null;
     AmazonKinesis kinesis;
+    AmazonKinesisClientBuilder kinesisClientBuilder;
 
     public WeatherBO() {
         gsonBuilder.serializeNulls();
@@ -35,42 +36,45 @@ public class WeatherBO {
             public String getAWSAccessKeyId() {
                 return ACCESS_KEY;
             }
+
             public String getAWSSecretKey() {
                 return SECRET_KEY;
             }
-
         };
         AWSCredentialsProvider credentials = new AWSCredentialsProvider() {
             public AWSCredentials getCredentials() {
                 return awsCredentials;
             }
+
             public void refresh() {
             }
         };
-        kinesis = AmazonKinesisClientBuilder.standard().withCredentials(credentials).build();
+        kinesisClientBuilder = AmazonKinesisClientBuilder.standard();
+        kinesisClientBuilder.withCredentials(credentials);
+        kinesis = kinesisClientBuilder.build();
     }
 
     public QResponse create(String body) {
         try {
             logger.info("Submitted to stream");
             JsonObject data = (JsonObject) gson.fromJson(body, JsonObject.class);
-            writeToStream(data);
-            return new QSuccessResponse(gson.fromJson(body, JsonObject.class));
+            String rep = writeToStream(data);
+            return new QSuccessResponse(rep);
         } catch (Exception e) {
             logger.info("Submit to Stream failed with " + e.getMessage());
             return new QErrorResponse(new QErrorResponse.Error(0, e.getMessage(), e.getStackTrace()));
         }
     }
 
-    public void writeToStream(JsonObject input) {
+    public String writeToStream(JsonObject input) {
         Charset utf8 = Charset.forName("UTF-8");
         PutRecordRequest putRecordRequest = new PutRecordRequest();
-        putRecordRequest.setStreamName("weather-stream");
-        putRecordRequest.setPartitionKey("S1");
+        putRecordRequest.setStreamName(StreamName);
+        putRecordRequest.setPartitionKey("W1");
         putRecordRequest.setData(ByteBuffer.wrap(input.toString().getBytes(utf8)));
 
         PutRecordResult putRecordResult = kinesis.putRecord(putRecordRequest);
 
-        System.out.println(putRecordResult.getSequenceNumber());
+        return putRecordResult.getSequenceNumber();
     }
 }

@@ -1,4 +1,3 @@
-
 package com.intuit.services.api;
 
 import com.intuit.services.core.JsonTransformer;
@@ -25,6 +24,7 @@ public class WeatherServer {
     }
 
     public static void main(String[] args) {
+
         WeatherServer weatherServer = new WeatherServer();
         port(7080);
         logger.info("Serivce running on post 7080");
@@ -46,7 +46,6 @@ public class WeatherServer {
         get("/api/weather/city/:city/:country", "application/json", (request, response) -> {
             return weatherServer.elasticSearchClient.getTemperature(request.params(":city"), request.params(":country"));
         }, new JsonTransformer());
-
 
     }
 }

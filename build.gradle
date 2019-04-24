@@ -6,7 +6,12 @@ task fatJar(type: Jar) {
         attributes 'Main-Class': 'com.intuit.services.api.WeatherServer'
     }
     baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from({ configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }){
+        // remove all signature files
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
     with jar
 }
 
@@ -21,7 +26,7 @@ dependencies {
     compile 'org.slf4j:slf4j-simple:1.7.26'
     compile 'org.elasticsearch.client:elasticsearch-rest-high-level-client:6.1.2'
     compile('com.google.code.gson:gson:2.3.1',
-            'com.amazonaws:aws-java-sdk-kinesis:1.11.538',
+            'com.amazonaws:aws-java-sdk-kinesis:1.11.243',
             'com.sparkjava:spark-core:2.9.0'
     )
 
