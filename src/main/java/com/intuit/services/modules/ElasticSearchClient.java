@@ -9,6 +9,8 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -32,19 +34,17 @@ public class ElasticSearchClient {
                         new HttpHost(weatherIndex, 443, "https")));
     }
 
-    public JsonObject getTemperature(String param1, String param2) {
+    public JsonObject getTemperatureByGPS(String param1, String param2) {
         JsonObject result = new JsonObject();
         JsonParser jsonParser = new JsonParser();
+        SearchResponse searchResponse = null;
         try {
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-            searchSourceBuilder.query(QueryBuilders.matchQuery("city.name",param1));
-//            searchSourceBuilder.query(QueryBuilders.matchQuery("city.country",param2));
 
+            searchSourceBuilder.query(QueryBuilders.termQuery("city.coord.lon", param1));
 
             SearchRequest searchRequest = new SearchRequest(nameIndex);
             searchRequest.source(searchSourceBuilder);
-
-            SearchResponse searchResponse = null;
 
             searchResponse = client.search(searchRequest);
 
@@ -53,7 +53,40 @@ public class ElasticSearchClient {
                 for (SearchHit searchHit : searchResponse.getHits()) {
                     String res = searchHit.getSourceAsString();
                     JsonElement temp = jsonParser.parse(res);
-                    array.add(temp.getAsJsonObject());
+                    if (temp.getAsJsonObject().get("city").getAsJsonObject().get("coord").getAsJsonObject().get("lat").getAsString().equalsIgnoreCase(param2)) {
+                        array.add(temp.getAsJsonObject());
+                    }
+                }
+                result.add("response", array);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public JsonObject getTemperatureByCity(String param1, String param2) {
+        JsonObject result = new JsonObject();
+        JsonParser jsonParser = new JsonParser();
+        SearchResponse searchResponse = null;
+        try {
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+
+            searchSourceBuilder.query(QueryBuilders.matchQuery("city.name", param1));
+
+            SearchRequest searchRequest = new SearchRequest(nameIndex);
+            searchRequest.source(searchSourceBuilder);
+
+            searchResponse = client.search(searchRequest);
+
+            if (searchResponse != null) {
+                JsonArray array = new JsonArray();
+                for (SearchHit searchHit : searchResponse.getHits()) {
+                    String res = searchHit.getSourceAsString();
+                    JsonElement temp = jsonParser.parse(res);
+                    if (temp.getAsJsonObject().get("city").getAsJsonObject().get("country").getAsString().equalsIgnoreCase(param2)) {
+                        array.add(temp.getAsJsonObject());
+                    }
                 }
                 result.add("response", array);
             }

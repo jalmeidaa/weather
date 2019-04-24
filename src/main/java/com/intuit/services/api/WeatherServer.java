@@ -44,7 +44,11 @@ public class WeatherServer {
         }, new JsonTransformer());
 
         get("/api/weather/city/:city/:country", "application/json", (request, response) -> {
-            return weatherServer.elasticSearchClient.getTemperature(request.params(":city"), request.params(":country"));
+            return weatherServer.elasticSearchClient.getTemperatureByCity(request.params(":city"), request.params(":country"));
+        }, new JsonTransformer());
+
+        get("/api/weather/gps/:lon/:lat", "application/json", (request, response) -> {
+            return weatherServer.elasticSearchClient.getTemperatureByGPS(request.params(":lon"), request.params(":lat"));
         }, new JsonTransformer());
 
     }
