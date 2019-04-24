@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
 public class WeatherBO {
     private static Logger logger = LoggerFactory.getLogger(WeatherBO.class);
     private static final String StreamName = "weather-stream";
-    private static final String ACCESS_KEY = "AKIAVJ66QSP3L46E73FG";
-    private static final String SECRET_KEY = "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";
+    private static final String ACCESS_KEY = "";
+    private static final String SECRET_KEY = "";
     GsonBuilder gsonBuilder = new GsonBuilder();
     Gson gson = null;
     AmazonKinesis kinesis;
@@ -33,10 +33,10 @@ public class WeatherBO {
         gson = gsonBuilder.create();
         final AWSCredentials awsCredentials = new AWSCredentials() {
             public String getAWSAccessKeyId() {
-                return "AKIAVJ66QSP3L46E73FG";
+                return ACCESS_KEY;
             }
             public String getAWSSecretKey() {
-                return "7EfiPMd5iWx/gIAirt8EwiZKIHGtGS97WQ+aHKva";
+                return SECRET_KEY;
             }
 
         };
