@@ -51,5 +51,21 @@ public class WeatherServer {
             return weatherServer.elasticSearchClient.getTemperatureByGPS(request.params(":lon"), request.params(":lat"));
         }, new JsonTransformer());
 
+        get("/api/weather/max", "application/json", (request, response) -> {
+            return weatherServer.elasticSearchClient.getTemperatureMaxMin("max");
+        }, new JsonTransformer());
+
+        get("/api/weather/min", "application/json", (request, response) -> {
+            return weatherServer.elasticSearchClient.getTemperatureMaxMin("min");
+        }, new JsonTransformer());
+
+        get("/api/weather/max_temp_by_time/:time", "application/json", (request, response) -> {
+            return weatherServer.elasticSearchClient.getMaxTemperatureByTime(request.params(":time"),"desc");
+        }, new JsonTransformer());
+
+        get("/api/weather/min_temp_by_time/:time", "application/json", (request, response) -> {
+            return weatherServer.elasticSearchClient.getMaxTemperatureByTime(request.params(":time"),"asc");
+        }, new JsonTransformer());
+
     }
 }
