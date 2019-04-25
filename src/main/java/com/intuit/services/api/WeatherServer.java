@@ -23,6 +23,9 @@ public class WeatherServer {
         elasticSearchClient = new ElasticSearchClient();
     }
 
+    //lsof -i :7080
+    //scp -i Desktop/Intuit/intuit.pem Desktop/Intuit/weather/build/libs/weather-all.jar ec2-user@ec2-52-41-190-120.us-west-2.compute.amazonaws.com:~
+    //ssh -i Desktop/Intuit/intuit.pem ec2-user@ec2-52-41-190-120.us-west-2.compute.amazonaws.com
     public static void main(String[] args) {
 
         WeatherServer weatherServer = new WeatherServer();
